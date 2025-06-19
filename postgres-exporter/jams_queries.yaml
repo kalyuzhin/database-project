@@ -1,0 +1,17 @@
+total_jams:
+  query: "SELECT COUNT(*) FROM jams;"
+  metrics:
+    - value:
+        usage: "GAUGE"
+
+total_active_jams:
+  query: "SELECT COUNT(*) FROM jams WHERE end_date <= CURRENT_DATE;"
+  metircs:
+    - value:
+        usage: "GAUGE"
+
+upcoming_jams:
+  query: "SELECT COUNT(*) FROM jams WHERE start_date >= CURRENT_DATE;"
+  metrics:
+    - value:
+        usage: "GAUGE"

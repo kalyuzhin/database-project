@@ -1,0 +1,13 @@
+games_total:
+  query: "SELECT COUNT(id) FROM games;"
+  metrics:
+    - value:
+        usage: "GAUGE"
+        description: "Total games number"
+
+games_today:
+  query: "SELECT COUNT(id) FROM games WHERE created_at::date = CURRENT_DATE;"
+  metrics:
+    - value:
+        usage: "GAUGE"
+        description: "Number of created games for today"

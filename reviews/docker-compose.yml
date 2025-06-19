@@ -1,0 +1,45 @@
+version: '3'
+
+services:
+  reviews_proxy:
+    image: postgres:14
+    container_name: reviews_proxy
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: sakila_reviews
+    volumes:
+      - ./init/proxy_setup.sql:/docker-entrypoint-initdb.d/proxy_setup.sql
+    ports:
+      - "5435:5432"
+    networks:
+      - reviews_network
+
+  reviews_shard1:
+    image: postgres:14
+    container_name: reviews_shard1
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: sakila_reviews
+    volumes:
+      - ./init/reviews_shard1.sql:/docker-entrypoint-initdb.d/reviews_shard1.sql
+    networks:
+      - reviews_network
+
+  reviews_shard2:
+    image: postgres:14
+    container_name: reviews_shard2
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: sakila_reviews
+    volumes:
+      - ./init/reviews_shard2.sql:/docker-entrypoint-initdb.d/reviews_shard2.sql
+    networks:
+      - reviews_network
+
+networks:
+  reviews_network:
+    driver: bridge
+

@@ -1,0 +1,6 @@
+total_users:
+  query: "SELECT COUNT(id) FROM users;"
+  metrics:
+    - value:
+        usage: "GAUGE"
+        description: "Total users number"

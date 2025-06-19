@@ -1,0 +1,63 @@
+groups:
+- name: Prometheus
+  rules:
+  - alert: PrometheusDown
+    expr: up == 0
+    for: 15s
+    labels:
+      severity: critical
+    annotations:
+      summary: "Prometheus down (instance {{ $labels.instance }})"
+      description: "Prometheus service is down"
+- name: Connections
+  rules:
+  - alert: ManyGamesConnections
+    expr: pg_stat_activity_count{datname="games"} > 2
+    for: 10s
+    labels:
+      severity: critical
+    annotations:
+      summary: "Too many connections (instance {{ $labels.instance }})"
+      description: "Database has got {{ $labels.value }} connections"
+  - alert: ManyJamsConnections
+    expr: pg_stat_activity_count{datname="jams"} > 2
+    for: 10s
+    labels:
+      severity: critical
+    annotations:
+      summary: "Too many connections (instance {{ $labels.instance }})"
+      description: "Database has got {{ $labels.value }} connections"
+  - alert: ManyUsersConnections
+    expr: pg_stat_activity_count{datname="users"} > 2
+    for: 10s
+    labels:
+      severity: critical
+    annotations:
+      summary: "Too many connections (instance {{ $labels.instance }})"
+      description: "Database has got {{ $labels.value }} connections"
+  - alert: ManyReviewsConnections
+    expr: pg_stat_activity_count{datname="reviews"} > 2
+    for: 10s
+    labels:
+      severity: critical
+    annotations:
+      summary: "Too many connections (instance {{ $labels.instance }})"
+      description: "Database has got {{ $labels.value }} connections"
+- name: BusinessLogic
+  rules:
+  - alert: LowRating
+    expr: avg_rating_avg < 3.5
+    for: 10s
+    labels:
+      severity: warning
+    annotations:
+      summary: "Low games rating"
+      description: "Low games rating"
+  - alert: FewJamsPresent
+    expr: (total_active_jams + upcoming_jams) < 5
+    for: 10s
+    labels:
+      severity: warning
+    annotations:
+      summary: "Too few jams"
+      description: "Total number of (active + upcoming) jams is less than 5. Currently: {{ $value }}."

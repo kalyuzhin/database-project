@@ -1,0 +1,45 @@
+version: '3'
+
+services:
+  jams_proxy:
+    image: postgres:14
+    container_name: jams_proxy
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: sakila_jams
+    volumes:
+      - ./init/proxy_setup.sql:/docker-entrypoint-initdb.d/proxy_setup.sql
+    ports:
+      - "5434:5432"
+    networks:
+      - jams_network
+
+  jams_shard1:
+    image: postgres:14
+    container_name: jams_shard1
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: sakila_jams
+    volumes:
+      - ./init/jams_shard1.sql:/docker-entrypoint-initdb.d/jams_shard1.sql
+    networks:
+      - jams_network
+
+  jams_shard2:
+    image: postgres:14
+    container_name: jams_shard2
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: sakila_jams
+    volumes:
+      - ./init/jams_shard2.sql:/docker-entrypoint-initdb.d/jams_shard2.sql
+    networks:
+      - jams_network
+
+networks:
+  jams_network:
+    driver: bridge
+

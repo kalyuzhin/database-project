@@ -1,0 +1,82 @@
+global:
+  resolve_timeout: 30s
+
+route:
+  receiver: 'tg-bot'
+  group_by: ['alertname']
+  group_wait: 10s
+  group_interval: 30s
+  repeat_interval: 30s
+  routes:
+    - match:
+        severity: critical
+      receiver: 'tg-bot'
+      repeat_interval: 30s
+
+receivers:
+- name: 'tg-bot'
+  telegram_configs:
+  - bot_token: '7852979637:AAH4dcGYipzVSb3fwXZD4jDbcznERBrNREQ'
+    chat_id: -1002636823108
+    parse_mode: 'HTML'
+    message: |
+      {{ $alert := index .Alerts 0 }}
+
+      🚨 <b>{{ .Status | toUpper }}</b>
+
+      <b>Информация о тревоге:</b>
+      📢 Type: {{ $alert.Labels.alertname }}
+      ⚠️  Severity: {{ $alert.Labels.severity }}
+      🖥️  Host: {{ $alert.Labels.instance }}
+
+      <b>Description:</b>
+      {{ $alert.Annotations.summary }}
+      📝 {{ $alert.Annotations.description }}
+
+      ———
+      <b>Инструкция по устранению:</b>
+      {{- if eq $alert.Labels.alertname "PrometheusDown" }}
+      1️⃣ Проверь, что сервис prometheus запущен:
+          <code>systemctl status prometheus</code>
+      2️⃣ Проверь логи:
+          <code>journalctl -u prometheus</code>
+      3️⃣ Перезапусти докер-компоуз:
+          <code>docker compose down</code>
+          <code>docker compose build</code>
+          <code>docker compose up -d</code>
+      4️⃣ Смотри логи:
+          <code>docker-compose logs</code> 
+      {{- else if eq $alert.Labels.alertname "ManyGamesConnections" }}
+      1️⃣ Проверь, какие запросы висят:
+          <code>psql -d games -c "select * from pg_stat_activity;"</code>
+      2️⃣ Свяжись с DBA, если проблема не решается.
+      {{- else if eq $alert.Labels.alertname "ManyJamsConnections" }}
+      1️⃣ Проверь активные подключения к jams:
+          <code>psql -d jams -c "select * from pg_stat_activity;"</code>
+      {{- else if eq $alert.Labels.alertname "ManyUsersConnections" }}
+      1️⃣ Проверь активные подключения к users:
+          <code>psql -d users -c "select * from pg_stat_activity;"</code>
+      {{- else if eq $alert.Labels.alertname "ManyReviewsConnections" }}
+      1️⃣ Проверь активные подключения к reviews:
+          <code>psql -d reviews -c "select * from pg_stat_activity;"</code>
+      {{- else if eq $alert.Labels.alertname "LowRating" }}
+      1️⃣ Проверь актуальность данных по рейтингу.
+      2️⃣ Свяжись с командой бизнес-логики.
+      {{- else if eq $alert.Labels.alertname "FewJamsPresent" }}
+      1️⃣ Проверь актуальность данных по количеству активных и предстоящих джемов.
+      2️⃣ Свяжись с командой бизнес-логики.
+      {{- else }}
+      Для этого алерта инструкция не назначена, обратитесь к SRE.
+      {{- end }}
+
+      🕐 Начало: {{ $alert.StartsAt }}
+      {{ if eq .Status "resolved" }}
+      ✅ Решено: {{ $alert.EndsAt }}
+      {{ end }}
+
+inhibit_rules:
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname']

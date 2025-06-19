@@ -1,0 +1,62 @@
+#!/bin/bash
+
+check_connection() {
+    local port=$1
+    local db=$2
+    echo "Проверка подключения к порту $port..."
+    if psql -h localhost -p $port -U postgres -d $db -c "SELECT 1;" > /dev/null 2>&1; then
+        echo "✅ Подключение успешно"
+        return 0
+    else
+        echo "❌ Ошибка подключения"
+        return 1
+    fi
+}
+
+spoil_rating() {
+    local port=$1
+    local db=$2
+    echo "Портим рейтинг играм..."
+    psql -h localhost -p $port -U postgres -d $db -c "INSERT INTO $db(user_id, user_mark, game_id) VALUES(1, 0, 1)" 2>/dev/null
+    psql -h localhost -p $port -U postgres -d $db -c "INSERT INTO $db(user_id, user_mark, game_id) VALUES(1, 0, 1)" 2>/dev/null
+    psql -h localhost -p $port -U postgres -d $db -c "INSERT INTO $db(user_id, user_mark, game_id) VALUES(1, 0, 1)" 2>/dev/null
+    psql -h localhost -p $port -U postgres -d $db -c "INSERT INTO $db(user_id, user_mark, game_id) VALUES(1, 0, 1)" 2>/dev/null
+    psql -h localhost -p $port -U postgres -d $db -c "INSERT INTO $db(user_id, user_mark, game_id) VALUES(1, 0, 1)" 2>/dev/null
+    psql -h localhost -p $port -U postgres -d $db -c "INSERT INTO $db(user_id, user_mark, game_id) VALUES(1, 0, 1)" 2>/dev/null
+    psql -h localhost -p $port -U postgres -d $db -c "INSERT INTO $db(user_id, user_mark, game_id) VALUES(1, 0, 1)" 2>/dev/null
+}
+
+fix_rating() {
+    local port=$1
+    local db=$2
+    echo "Исправляем рейтинг..."
+    psql -h localhost -p $port -U postgres -d $db -c "INSERT INTO $db(user_id, user_mark, game_id) VALUES(1, 5, 1)" 2>/dev/null
+    psql -h localhost -p $port -U postgres -d $db -c "INSERT INTO $db(user_id, user_mark, game_id) VALUES(1, 5, 1)" 2>/dev/null
+    psql -h localhost -p $port -U postgres -d $db -c "INSERT INTO $db(user_id, user_mark, game_id) VALUES(1, 5, 1)" 2>/dev/null
+    psql -h localhost -p $port -U postgres -d $db -c "INSERT INTO $db(user_id, user_mark, game_id) VALUES(1, 5, 1)" 2>/dev/null
+    psql -h localhost -p $port -U postgres -d $db -c "INSERT INTO $db(user_id, user_mark, game_id) VALUES(1, 5, 1)" 2>/dev/null
+    psql -h localhost -p $port -U postgres -d $db -c "INSERT INTO $db(user_id, user_mark, game_id) VALUES(1, 5, 1)" 2>/dev/null
+    psql -h localhost -p $port -U postgres -d $db -c "INSERT INTO $db(user_id, user_mark, game_id) VALUES(1, 5, 1)" 2>/dev/null
+}
+
+echo -e "\n=== Проверка подключения к прокси ==="
+export PGPASSWORD=postgres
+
+check_connection 5432 users
+check_connection 5433 games
+check_connection 5434 jams
+check_connection 5435 reviews
+
+echo -e "\n=== Ждём перед тем как испортить рейтинг ==="
+read -p "Нажмите Enter чтобы продолжить..."
+
+spoil_rating 5435 reviews
+
+echo -e "\n=== Исправляем рейтинг ==="
+read -p "Нажмите Enter чтобы продолжить..."
+
+fix_rating 5435 reviews
+
+echo -e "\n=== Выключаем сервис, чтобы сработал алерт ==="
+read -p "Нажмите Enter чтобы продолжить..."
+docker stop node-exp

@@ -1,0 +1,300 @@
+services:
+# Домен игр
+  games_proxy:
+    image: postgres:latest
+    container_name: games_proxy
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: games
+    volumes:
+      - ./games/init/proxy_setup.sql:/docker-entrypoint-initdb.d/proxy_setup.sql
+    ports:
+      - "5433:5432"
+    networks:
+      - network
+
+  games_shard1:
+    image: postgres:latest
+    container_name: games_shard1
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: games
+    volumes:
+      - ./games/init/games_shard1.sql:/docker-entrypoint-initdb.d/games_shard1.sql
+    networks:
+      - network
+
+  games_shard2:
+    image: postgres:latest
+    container_name: games_shard2
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: games
+    volumes:
+      - ./games/init/games_shard2.sql:/docker-entrypoint-initdb.d/games_shard2.sql
+    networks:
+      - network
+
+# Домен джемов
+    
+  jams_proxy:
+    image: postgres:latest
+    container_name: jams_proxy
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: jams
+    volumes:
+      - ./jams/init/proxy_setup.sql:/docker-entrypoint-initdb.d/proxy_setup.sql
+    ports:
+      - "5434:5432"
+    networks:
+      - network
+
+  jams_shard1:
+    image: postgres:latest
+    container_name: jams_shard1
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: jams
+    volumes:
+      - ./jams/init/jams_shard1.sql:/docker-entrypoint-initdb.d/jams_shard1.sql
+    networks:
+      - network
+
+  jams_shard2:
+    image: postgres:latest
+    container_name: jams_shard2
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: jams
+    volumes:
+      - ./jams/init/jams_shard2.sql:/docker-entrypoint-initdb.d/jams_shard2.sql
+    networks:
+      - network
+
+  # Домен отзывов
+  
+  reviews_proxy:
+    image: postgres:latest
+    container_name: reviews_proxy
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: reviews
+    volumes:
+      - ./reviews/init/proxy_setup.sql:/docker-entrypoint-initdb.d/proxy_setup.sql
+    ports:
+      - "5435:5432"
+    networks:
+      - network
+
+  reviews_shard1:
+    image: postgres:latest
+    container_name: reviews_shard1
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: reviews
+    volumes:
+      - ./reviews/init/reviews_shard1.sql:/docker-entrypoint-initdb.d/reviews_shard1.sql
+    networks:
+      - network
+
+  reviews_shard2:
+    image: postgres:latest
+    container_name: reviews_shard2
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: reviews
+    volumes:
+      - ./reviews/init/reviews_shard2.sql:/docker-entrypoint-initdb.d/reviews_shard2.sql
+    networks:
+      - network
+
+# Домен Пользователей
+
+  users_proxy:
+    image: postgres:latest
+    container_name: users_proxy
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: users
+    volumes:
+      - ./users/init/proxy_setup.sql:/docker-entrypoint-initdb.d/proxy_setup.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - network
+
+  users_shard1:
+    image: postgres:14
+    container_name: users_shard1
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: users
+    volumes:
+      - ./users/init/users_shard1.sql:/docker-entrypoint-initdb.d/users_shard1.sql
+    networks:
+      - network
+
+  users_shard2:
+    image: postgres:latest
+    container_name: users_shard2
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: users
+    volumes:
+      - ./users/init/users_shard2.sql:/docker-entrypoint-initdb.d/users_shard2.sql
+    networks:
+      - network
+
+# Домен тегов
+
+  tags_proxy:
+    image: postgres:latest
+    container_name: tags_proxy
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: tags
+    volumes:
+      - ./tags/init/proxy_setup.sql:/docker-entrypoint-initdb.d/proxy_setup.sql
+    ports:
+      - "5436:5432"
+    networks:
+      - network
+
+# Grafana
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - 3000:3000
+    volumes:
+      - grafana-storage:/var/lib/grafana
+      - ./grafana/provisioning/:/etc/grafana/provisioning/
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    networks:
+      - network
+
+# Postgres-Exporter для прокси
+  postgres-exporter-games:
+    container_name: postgres_exp_games
+    image: quay.io/prometheuscommunity/postgres-exporter:latest
+    ports:
+      - 9187:9187
+    volumes:
+      - ./postgres-exporter/games_queries.yaml:/etc/postgres_exporter/queries.yaml
+    environment:
+      DATA_SOURCE_NAME: "user=postgres password=postgres host=games_proxy port=5432 dbname=games sslmode=disable"
+      PG_EXPORTER_EXTEND_QUERY_PATH: /etc/postgres_exporter/queries.yaml
+    depends_on:
+      - games_proxy
+    networks:
+      - network
+
+  postgres-exporter-jams:
+    container_name: postgres_exp_jams
+    image: quay.io/prometheuscommunity/postgres-exporter:latest
+    ports:
+      - 9188:9187
+    volumes:
+      - ./postgres-exporter/jams_queries.yaml:/etc/postgres_exporter/queries.yaml
+    environment:
+      DATA_SOURCE_NAME: "user=postgres password=postgres host=jams_proxy port=5432 dbname=jams sslmode=disable"
+      PG_EXPORTER_EXTEND_QUERY_PATH: /etc/postgres_exporter/queries.yaml
+    depends_on:
+      - jams_proxy
+    networks:
+      - network
+
+  postgres-exporter-reviews:
+    container_name: postgres_exp_reviews
+    image: quay.io/prometheuscommunity/postgres-exporter:latest
+    ports:
+      - 9189:9187
+    volumes:
+      - ./postgres-exporter/reviews_queries.yaml:/etc/postgres_exporter/queries.yaml
+    environment:
+      DATA_SOURCE_NAME: "user=postgres password=postgres host=reviews_proxy port=5432 dbname=reviews sslmode=disable"
+      PG_EXPORTER_EXTEND_QUERY_PATH: /etc/postgres_exporter/queries.yaml
+    depends_on:
+      - reviews_proxy
+    networks:
+      - network
+
+  postgres-exporter-users:
+    container_name: postgres_exp_users
+    image: quay.io/prometheuscommunity/postgres-exporter:latest
+    ports:
+      - 9190:9187
+    volumes:
+      - ./postgres-exporter/users_queries.yaml:/etc/postgres_exporter/queries.yaml
+    environment:
+      DATA_SOURCE_NAME: "user=postgres password=postgres host=users_proxy port=5432 dbname=users sslmode=disable"
+      PG_EXPORTER_EXTEND_QUERY_PATH: /etc/postgres_exporter/queries.yaml
+    depends_on:
+      - users_proxy
+    networks:
+      - network
+
+# Prometheus
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - 9090:9090
+    volumes:
+      - ./prometheus/:/etc/prometheus/
+      - prometheus-storage:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    networks:
+      - network
+
+# Alert manager
+  alertmanager:
+    container_name: alertmanager
+    image: prom/alertmanager:latest
+    ports:
+      - 9093:9093
+    volumes:
+      - ./alertmanager/:/etc/alertmanager/
+      - alertmanager-storage:/alertmanager
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+      - '--storage.path=/alertmanager'
+    networks:
+      - network
+
+# Node Exporter
+  node-exp:
+    container_name: node-exp
+    image: prom/node-exporter
+    ports:
+      - "9100:9100"
+    networks:
+      - network
+
+networks:
+  network:
+    driver: bridge
+
+volumes:
+  grafana-storage: {}
+  prometheus-storage: {}
+  alertmanager-storage: {}

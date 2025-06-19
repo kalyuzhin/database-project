@@ -1,0 +1,6 @@
+avg_rating:
+  query: "SELECT AVG(user_mark) FROM reviews;"
+  metrics:
+    - value:
+        usage: "GAUGE"
+        description: "average rating of all games"
