@@ -15,15 +15,15 @@ average_users_age:
         usage: "GAUGE"
         description: "Average users age"
 
-count_users_locations:
-  query: >
-    SELECT loc AS location, COUNT(*) AS user_count
-    FROM users
-    GROUP BY loc
-    ORDER BY user_count DESC;
-  metrics:
-    - name: user_count_by_location
-      usage: "GAUGE"
-      description: "Something like percentage of users in locations"
-      labels:
-        - location
+# count_users_locations:
+#   query: >
+#     SELECT loc AS location, COUNT(*) AS user_count
+#     FROM users
+#     GROUP BY loc
+#     ORDER BY user_count DESC;
+#   metrics:
+#     - name: user_count_by_location
+#       usage: "GAUGE"
+#       description: "Something like percentage of users in locations"
+#       labels:
+#         - location
