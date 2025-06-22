@@ -14,6 +14,15 @@ CREATE TABLE jams (
     CONSTRAINT jams_id_range CHECK (MOD(id, 2)=1)
 );
 
+CREATE TABLE jam_participants (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    jam_id INTEGER NOT NULL,
+    user_id INTEGER NOT NULL,
+    role VARCHAR(50),
+    joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (jam_id) REFERENCES jams(id) ON DELETE CASCADE
+);
+
 -- Таблица jams_tags
 CREATE TABLE jams_tags (
     id SERIAL PRIMARY KEY,
