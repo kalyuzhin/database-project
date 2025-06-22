@@ -11,3 +11,17 @@ games_today:
     - value:
         usage: "GAUGE"
         description: "Number of created games for today"
+
+count_average_reviews_on_game:
+  query: >
+    SELECT AVG(review_count) AS average_reviews_per_game
+    FROM (
+        SELECT g.id AS game_id, COUNT(r.id) AS review_count
+        FROM games g
+        LEFT JOIN reviews r ON g.id = r.game_id
+        GROUP BY g.id
+    );
+  metrics:
+    - value:
+        usage: "GAUGE"
+        description: ""

@@ -4,3 +4,13 @@ avg_rating:
     - value:
         usage: "GAUGE"
         description: "average rating of all games"
+
+reviews_for_last_month:
+  query: >
+    SELECT COUNT(*) AS total_reviews_last_30_days
+    FROM reviews
+    WHERE created >= NOW() - INTERVAL '30 DAYS';
+  metrics:
+    - value:
+        usage: "GAUGE"
+        description: ""

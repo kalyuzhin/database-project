@@ -4,3 +4,24 @@ total_users:
     - value:
         usage: "GAUGE"
         description: "Total users number"
+
+average_users_age:
+  query: >
+    SELECT AVG(EXTRACT(YEAR FROM AGE(birthday))) AS average_age
+    FROM users
+    WHERE birthday IS NOT NULL;
+  metrics:
+    - value:
+        usage: "GAUGE"
+        description: "Average users age"
+
+users_locations:
+  query: >
+    SELECT loc AS location, COUNT(*) AS user_count
+    FROM users
+    GROUP BY loc
+    ORDER BY user_count DESC;
+  metrics:
+    - value:
+        usage: "GAUGE"
+        description: ""
