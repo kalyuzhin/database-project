@@ -119,8 +119,7 @@ CREATE FOREIGN TABLE jams_participants_shard1 (
     user_id INTEGER NOT NULL,
     role VARCHAR(50),
     joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (jam_id) REFERENCES jams(id) ON DELETE CASCADE,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    FOREIGN KEY (jam_id) REFERENCES jams(id) ON DELETE CASCADE
 ) SERVER jams_shard1 OPTIONS (schema_name 'public', table_name 'jams_participants');
 
 CREATE FOREIGN TABLE jams_participants_shard2 (
@@ -129,8 +128,7 @@ CREATE FOREIGN TABLE jams_participants_shard2 (
     user_id INTEGER NOT NULL,
     role VARCHAR(50),
     joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (jam_id) REFERENCES jams(id) ON DELETE CASCADE,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    FOREIGN KEY (jam_id) REFERENCES jams(id) ON DELETE CASCADE
 ) SERVER jams_shard1 OPTIONS (schema_name 'public', table_name 'jams_participants');
 
 CREATE VIEW jams_participants AS
