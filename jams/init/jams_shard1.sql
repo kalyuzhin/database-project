@@ -3,7 +3,7 @@
 -- Таблица jams
 CREATE TABLE jams (
     id SERIAL PRIMARY KEY,
-    name CHAR(1),
+    name CHAR(30),
     author_id INTEGER,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),

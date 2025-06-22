@@ -9,6 +9,27 @@ CREATE SERVER jams_shard1 FOREIGN DATA WRAPPER postgres_fdw
 CREATE SERVER jams_shard2 FOREIGN DATA WRAPPER postgres_fdw
     OPTIONS (host 'jams_shard2', port '5432', dbname 'jams');
 
+CREATE SERVER users_proxy_server FOREIGN DATA WRAPPER postgres_fdw
+    OPTIONS(
+      host 'users_proxy',
+      port '5432',
+      dbname 'users'
+  );
+
+CREATE SERVER reviews_proxy_server FOREIGN DATA WRAPPER postgres_fdw
+    OPTIONS(
+      host 'reviews_proxy',
+      port '5432',
+      dbname 'reviews'
+  );
+
+CREATE SERVER games_proxy_server FOREIGN DATA WRAPPER postgres_fdw
+    OPTIONS(
+      host 'games_proxy',
+      port '5432',
+      dbname 'games'
+  );
+
 -- Создание пользовательских маппингов
 CREATE USER MAPPING FOR postgres SERVER jams_shard1
     OPTIONS (user 'postgres', password 'postgres');
@@ -16,10 +37,19 @@ CREATE USER MAPPING FOR postgres SERVER jams_shard1
 CREATE USER MAPPING FOR postgres SERVER jams_shard2
     OPTIONS (user 'postgres', password 'postgres');
 
+CREATE USER MAPPING FOR CURRENT_USER SERVER users_proxy_server
+    OPTIONS (user 'postgres', password 'postgres');
+
+CREATE USER MAPPING FOR CURRENT_USER SERVER reviews_proxy_server
+    OPTIONS (user 'postgres', password 'postgres');
+
+CREATE USER MAPPING FOR CURRENT_USER SERVER games_proxy_server
+    OPTIONS (user 'postgres', password 'postgres');
+
 -- Создание внешних таблиц для каждого шарда
 CREATE FOREIGN TABLE jams_shard1 (
     id INTEGER,
-    name CHAR(1),
+    name CHAR(30),
     author_id INTEGER,
     created_at TIMESTAMP,
     updated_at TIMESTAMP,
@@ -31,7 +61,7 @@ CREATE FOREIGN TABLE jams_shard1 (
 
 CREATE FOREIGN TABLE jams_shard2 (
     id INTEGER,
-    name CHAR(1),
+    name CHAR(30),
     author_id INTEGER,
     created_at TIMESTAMP,
     updated_at TIMESTAMP,
@@ -40,6 +70,41 @@ CREATE FOREIGN TABLE jams_shard2 (
     end_date TIMESTAMP,
     description TEXT
 ) SERVER jams_shard2 OPTIONS (schema_name 'public', table_name 'jams');
+
+CREATE FOREIGN TABLE users (
+    id INTEGER,
+    full_name VARCHAR(255),
+    nickname VARCHAR(255),
+    email VARCHAR(255),
+    pswd_hash TEXT,
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP,
+    birthday DATE,
+    phone_number CHAR(1),
+    location VARCHAR(255)
+) SERVER users_proxy_server OPTIONS (schema_name 'public', table_name 'users');
+
+CREATE FOREIGN TABLE reviews (
+    id SERIAL,
+    user_id INTEGER,
+    user_mark DECIMAL(2,1) CHECK (
+      user_mark IN (0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5)
+    ),
+    criterion VARCHAR(255),
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP,
+    game_id INTEGER,
+    jam_id INTEGER
+) SERVER reviews_proxy_server OPTIONS (schema_name 'public', table_name 'reviews');
+
+CREATE FOREIGN TABLE games (
+    id INTEGER,
+    name VARCHAR(60),
+    description TEXT,
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP,
+    author_id INTEGER
+) SERVER games_proxy_server OPTIONS (schema_name 'public', table_name 'games');
 
 -- Создание представления, объединяющего все шарды
 CREATE VIEW jams AS
