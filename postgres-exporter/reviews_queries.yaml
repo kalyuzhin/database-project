@@ -9,7 +9,7 @@ reviews_for_last_month:
   query: >
     SELECT COUNT(*) AS total_reviews_last_30_days
     FROM reviews
-    WHERE created >= NOW() - INTERVAL '30 DAYS';
+    WHERE created_at >= NOW() - INTERVAL '30 DAYS';
   metrics:
     - value:
         usage: "GAUGE"

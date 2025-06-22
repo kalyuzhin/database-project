@@ -11,7 +11,7 @@ CREATE TABLE users (
     updated_at TIMESTAMP DEFAULT NOW(),
     birthday DATE,
     phone_number CHAR(1),
-    location VARCHAR(255),
+    loc VARCHAR(255),
     CONSTRAINT users_id_range CHECK (MOD(id, 2)=0)
 );
 
@@ -60,7 +60,7 @@ CREATE INDEX idx_notifications_actor_id ON notifications USING btree (actor_id);
 -- Вставка тестовых данных для шарда 1 (пользователи с четными ID)
 
 -- Пользователи
-INSERT INTO users (id, full_name, nickname, email, pswd_hash, created_at, updated_at, birthday, location) VALUES 
+INSERT INTO users (id, full_name, nickname, email, pswd_hash, created_at, updated_at, birthday, loc) VALUES 
 (2, 'John Doe', 'johndoe', 'john.doe@example.com', 'hash123', NOW(), NOW(), '1990-01-01', 'New York'),
 (4, 'Jane Smith', 'janesmith', 'jane.smith@example.com', 'hash456', NOW(), NOW(), '1992-05-15', 'Los Angeles'),
 (6, 'Bob Johnson', 'bobjohnson', 'bob.johnson@example.com', 'hash789', NOW(), NOW(), '1985-11-30', 'Chicago');

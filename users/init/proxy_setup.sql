@@ -57,7 +57,7 @@ CREATE FOREIGN TABLE users_shard1 (
     updated_at TIMESTAMP,
     birthday DATE,
     phone_number CHAR(1),
-    location VARCHAR(255)
+    loc VARCHAR(255)
 ) SERVER users_shard1 OPTIONS (schema_name 'public', table_name 'users');
 
 CREATE FOREIGN TABLE users_shard2 (
@@ -70,7 +70,7 @@ CREATE FOREIGN TABLE users_shard2 (
     updated_at TIMESTAMP,
     birthday DATE,
     phone_number CHAR(1),
-    location VARCHAR(255)
+    loc VARCHAR(255)
 ) SERVER users_shard2 OPTIONS (schema_name 'public', table_name 'users');
 
 CREATE FOREIGN TABLE reviews (

@@ -135,7 +135,7 @@ services:
       - network
 
   users_shard1:
-    image: postgres:14
+    image: postgres:latest
     container_name: users_shard1
     environment:
       POSTGRES_USER: postgres
