@@ -14,8 +14,8 @@ CREATE TABLE jams (
     CONSTRAINT jams_id_range CHECK (MOD(id, 2)=1)
 );
 
-CREATE TABLE jam_participants (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+CREATE TABLE jams_participants (
+    id SERIAL PRIMARY KEY,
     jam_id INTEGER NOT NULL,
     user_id INTEGER NOT NULL,
     role VARCHAR(50),

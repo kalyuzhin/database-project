@@ -112,24 +112,22 @@ CREATE VIEW jams AS
     UNION ALL
     SELECT * FROM jams_shard2;
 
--- Создание внешних таблиц для jams_tags
+-- Создание внешних таблиц
 CREATE FOREIGN TABLE jams_participants_shard1 (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER,
     jam_id INTEGER NOT NULL,
     user_id INTEGER NOT NULL,
     role VARCHAR(50),
-    joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (jam_id) REFERENCES jams(id) ON DELETE CASCADE
+    joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) SERVER jams_shard1 OPTIONS (schema_name 'public', table_name 'jams_participants');
 
 CREATE FOREIGN TABLE jams_participants_shard2 (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER,
     jam_id INTEGER NOT NULL,
     user_id INTEGER NOT NULL,
     role VARCHAR(50),
-    joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (jam_id) REFERENCES jams(id) ON DELETE CASCADE
-) SERVER jams_shard1 OPTIONS (schema_name 'public', table_name 'jams_participants');
+    joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) SERVER jams_shard2 OPTIONS (schema_name 'public', table_name 'jams_participants');
 
 CREATE VIEW jams_participants AS
     SELECT * FROM jams_participants_shard1
