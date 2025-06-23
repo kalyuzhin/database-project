@@ -158,19 +158,21 @@ CREATE OR REPLACE FUNCTION insert_into_games_view()
 RETURNS TRIGGER AS $$
 DECLARE
   target_shard TEXT;
+  generated_id INTEGER;
 BEGIN
   IF NEW.id IS NULL THEN
-    RAISE EXCEPTION 'id must be specified for insertion';
+    SELECT nextval('global_games_id_seq') INTO generated_id;
+    NEW.id := generated_id;
   END IF;
 
   target_shard := get_game_shard(NEW.id);
 
   IF target_shard = 'games_shard1' THEN
-        INSERT INTO games_shard1(name, description, created_at, updated_at, author_id)
-    VALUES (NEW.name, NEW.description, NEW.created_at, NEW.updated_at, NEW.author_id);
+        INSERT INTO games_shard1(id, name, description, created_at, updated_at, author_id)
+    VALUES (NEW.id, NEW.name, NEW.description, NEW.created_at, NEW.updated_at, NEW.author_id);
   ELSIF target_shard = 'games_shard2' THEN
-        INSERT INTO games_shard2(name, description, created_at, updated_at, author_id)
-    VALUES (NEW.name, NEW.description, NEW.created_at, NEW.updated_at, NEW.author_id);
+        INSERT INTO games_shard2(id, name, description, created_at, updated_at, author_id)
+    VALUES (NEW.id, NEW.name, NEW.description, NEW.created_at, NEW.updated_at, NEW.author_id);
   ELSE
     RAISE EXCEPTION 'Unknown shard: %', target_shard;
   END IF;
@@ -217,3 +219,9 @@ INSTEAD OF INSERT ON game_tags
 FOR EACH ROW
 EXECUTE FUNCTION insert_into_game_tags_view();
 
+CREATE SEQUENCE global_games_id_seq
+START WITH 7
+INCREMENT BY 1
+NO MINVALUE
+NO MAXVALUE
+CACHE 1;

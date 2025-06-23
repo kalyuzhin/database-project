@@ -60,3 +60,10 @@ fix_rating 5435 reviews
 echo -e "\n=== Выключаем сервис, чтобы сработал алерт ==="
 read -p "Нажмите Enter чтобы продолжить..."
 docker stop node-exp
+
+echo -e "\n=== Проверяем работу JDBC ==="
+read -p "Нажмите Enter чтобы продолжить..."
+javac -cp .:"/System/Volumes/Data/Users/kalyuzhin/Library/Application Support/JetBrains/DataGrip2024.3/jdbc-drivers/PostgreSQL/42.7.3/org/postgresql/postgresql/42.7.3/postgresql-42.7.3.jar" ProxyConnection.java
+java -cp .:"/System/Volumes/Data/Users/kalyuzhin/Library/Application Support/JetBrains/DataGrip2024.3/jdbc-drivers/PostgreSQL/42.7.3/org/postgresql/postgresql/42.7.3/postgresql-42.7.3.jar" ProxyConnection 
+
+echo -e "\n=== Работа скрипта окончена ==="
